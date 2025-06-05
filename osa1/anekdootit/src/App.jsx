@@ -33,7 +33,7 @@ const App = () => {
       ranNum = Math.floor(Math.random() * 8) 
     }
     setSelected(ranNum)
-    console.log(votes)
+    //console.log(votes)
   }
 
   const handleVoteClick = () => {
