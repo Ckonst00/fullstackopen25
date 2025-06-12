@@ -14,7 +14,4 @@ const getWeather = (city) => {
     return request.then(response => response.data)
 }
 
-const getIcon = (code) => {
-    return request = axios.get(`https://openweathermap.org/img/wn/${code}@2x.png`)
-}
 export default { getAll, getWeather }

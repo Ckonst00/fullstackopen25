@@ -86,7 +86,6 @@ const Weather = ({ capital }) => {
         alt={weather.weather[0].description}
       />
       <p>Wind: {weather.wind.speed} m/s</p>
-      <p>{weather.weather[0].description}</p>
     </>
   ) : (
     <p>Loading weather...</p>
