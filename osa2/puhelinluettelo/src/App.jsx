@@ -124,6 +124,10 @@ useEffect(hook, [])
         setNewName('')
         setNewNumber('')
       })
+      .catch(error => {
+        setErrorMessage(`${error.response.data.error}`)
+        setTimeout(() => {setErrorMessage('')}, 5000)
+      })
     }
   }
   
