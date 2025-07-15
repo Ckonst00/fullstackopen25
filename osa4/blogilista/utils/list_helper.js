@@ -1,3 +1,4 @@
+const { models } = require("mongoose")
 const blog = require("../models/blog")
 const _ = require('lodash')
 
@@ -33,9 +34,20 @@ const mostBlogs = (blogs) => {
     return {author: AuthorWithMostBlogs[0], blogs: AuthorWithMostBlogs[1]}
 }
 
+const mostLikes = (blogs) => {
+    const bloggers = _.groupBy(blogs, "author")
+    const mostLikesForAuthor = _(bloggers).map((content, author) => ({
+    author,
+    likes: _.sumBy(content, 'likes')
+  }))
+  const mostLiked = mostLikesForAuthor.maxBy('likes')
+  return mostLiked
+}
+
 module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
-    mostBlogs
+    mostBlogs,
+    mostLikes
 }
