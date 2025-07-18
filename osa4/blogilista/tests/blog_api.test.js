@@ -132,6 +132,22 @@ test('Deletion works', async () => {
   assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
 })
 
+test('Update likes', async () => {
+  const newBlog = {
+        title: "React patterns",
+        author: "Michael Chan",
+        url: "https://reactpatterns.com/",
+        likes: 38,
+  }
+
+  const update = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+
+  assert.strictEqual(update.body.likes, newBlog.likes)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
