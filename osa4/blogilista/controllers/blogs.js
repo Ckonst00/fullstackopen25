@@ -2,6 +2,7 @@ const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
+const middleware = require('../utils/middleware')
 
 
 
@@ -11,18 +12,11 @@ blogRouter.get('/', async (request, response) => {
 
 })
 
-blogRouter.post('/', async (request, response, next) => {
+blogRouter.post('/', middleware.userExtractor, async (request, response, next) => {
   try {
     const body = request.body
 
-    //const token = getTokenFrom(request)
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
-
-    const user = await User.findById(decodedToken.id)
+    const user = request.user
 
     if (!user) {
       return response.status(400).json({ error: 'userId missing or not valid' })
@@ -68,6 +62,26 @@ blogRouter.put('/:id', async (request, response, next) => {
     }
   }
 
+})
+
+blogRouter.delete('/:id', middleware.userExtractor, async (request, response, next) => {
+  
+  try {
+    const user = request.user
+    const blog = await Blog.findById(request.params.id)
+
+    if (blog.user.toString() !== user.id.toString()) {
+      return response.status(403).json({ error: 'Only the authorized user can delete this blog' })
+    }
+
+    await Blog.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+  } catch (error) {
+    if (error.name === 'CastError') {
+      return response.status(400).json({ error: 'Malformed ID' });
+    }
+    next(error)
+  }
 })
 
 module.exports = blogRouter
