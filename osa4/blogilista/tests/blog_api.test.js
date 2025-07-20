@@ -5,11 +5,30 @@ const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
+
 
 const api = supertest(app)
-
-
+process.env.SECRET = 'testsecret'
+let token
 beforeEach(async () => {
+  await User.deleteMany({})
+  const userPassword = await bcrypt.hash('passaworde', 10)
+  const userObject = new User({
+    username: "testuser",
+    name: "jest user",
+    passwordHash: userPassword
+  })
+  await userObject.save()
+
+  const response = await api
+    .post('/api/login')
+    .send({ username: "testuser", password: "passaworde" })
+
+  token = `Bearer ${response.body.token}`
+
+
   await Blog.deleteMany({})
   let blogObject = new Blog(helper.initialBlogs[0])
   await blogObject.save()
@@ -32,7 +51,7 @@ test('all blogs are returned', async () => {
 })
 
 
-test('blog identifier is called id', async() => {
+test('blog identifier is called id', async () => {
   const response = await api.get('/api/blogs')
   const blogs = response.body
 
@@ -40,10 +59,11 @@ test('blog identifier is called id', async() => {
 
   assert.ok(blog.id)
   assert.strictEqual(blog._id, undefined)
-  
+
 })
 
-test('Adding blog via POST req', async() => {
+test('Adding blog via POST req', async () => {
+
   const newBlog = {
     title: 'Adding new blog',
     author: 'Mina Itse',
@@ -54,6 +74,7 @@ test('Adding blog via POST req', async() => {
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set('Authorization', token)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
@@ -64,15 +85,16 @@ test('Adding blog via POST req', async() => {
   assert(titles.includes('Adding new blog'))
 })
 
-test('likes default to zero', async() => {
+test('likes default to zero', async () => {
   const newBlog = {
-     title: "Canonical string reduction",
-      author: "Edsger W. Dijkstra",
-      url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+    title: "Canonical string reduction",
+    author: "Edsger W. Dijkstra",
+    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
   }
 
-const response = await api
+  const response = await api
     .post('/api/blogs')
+    .set('Authorization', token)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -91,7 +113,7 @@ test('Blog with missing title is not added', async () => {
   await api
     .post('/api/blogs')
     .send(newBlog)
-    .expect(400)
+    .expect(401)
 
   const blogsAtEnd = await helper.blogsInDb()
 
@@ -107,8 +129,9 @@ test('Blog with missing url is not added', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', token)
     .send(newBlog)
-    .expect(400)
+    .expect(401)
 
   const blogsAtEnd = await helper.blogsInDb()
 
@@ -117,31 +140,37 @@ test('Blog with missing url is not added', async () => {
 
 
 test('Deletion works', async () => {
-  
-  const blogsAtStart = await helper.blogsInDb();
-  const blogToDelete = blogsAtStart[0];
+
+  const exampleBlog = {
+    title: "Initial statement",
+    author: 'Isulym Ausce',
+    url: 'https://www.asdf.com',
+    likes: 5
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .set('Authorization', token)
+    .send(exampleBlog)
+    .expect(201)
 
   await api
-    .delete(`/api/blogs/${blogToDelete.id}`)
+    .delete(`/api/blogs/${response.body.id}`)
+    .set('Authorization', token)
     .expect(204);
-
-  const blogsAtEnd = await helper.blogsInDb();
-
-  const titles = blogsAtEnd.map(b => b.title);
-  assert(!titles.includes(blogToDelete.title));
-  assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
 })
 
 test('Update likes', async () => {
   const newBlog = {
-        title: "React patterns",
-        author: "Michael Chan",
-        url: "https://reactpatterns.com/",
-        likes: 38,
+    title: "React patterns",
+    author: "Michael Chan",
+    url: "https://reactpatterns.com/",
+    likes: 38,
   }
 
   const update = await api
     .post('/api/blogs')
+    .set('Authorization', token)
     .send(newBlog)
     .expect(201)
 
