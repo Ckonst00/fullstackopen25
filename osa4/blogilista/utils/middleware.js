@@ -1,13 +1,13 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const { response } = require("../app");
-
 const tokenExtractor = (request, response, next) => {
   const authorization = request.get('authorization')
 
   if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
+    request.token = authorization.replace('Bearer ', '')
+  } else {
+    request.token = null
   }
-  return null
+
   next()
 }
+
+module.exports = {tokenExtractor}
