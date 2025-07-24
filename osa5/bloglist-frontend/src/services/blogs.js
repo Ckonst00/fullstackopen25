@@ -20,6 +20,11 @@ const response = await axios.post(baseUrl, newObject, config)
 return response.data
 }
 
+const setLike = async newObject => {
+  const url = `${baseUrl}/${newObject.id}`
+  const response = await axios.put(url, newObject)
+  return response.data
+}
 
 
-export default { getAll, create, setToken }
+export default { getAll, create, setToken, setLike }
