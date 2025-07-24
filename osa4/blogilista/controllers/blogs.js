@@ -48,21 +48,25 @@ blogRouter.post('/', middleware.userExtractor,  middleware.tokenExtractor, async
 })
 
 blogRouter.put('/:id', async (request, response, next) => {
-
   try {
-  const body = await Blog.findById(request.params.id)
+    const blog = await Blog.findById(request.params.id)
 
-  body.likes = blog.likes
+    if (!blog) {
+      return response.status(404).json({ error: 'Blog not found' })
+    }
 
-  const updatedLikes = await blog.save()
-  response.status(201).json(updatedLikes)
+    blog.likes = request.body.likes
+
+    const updatedBlog = await blog.save()
+    response.status(200).json(updatedBlog)
   } catch (error) {
     if (error.name === 'CastError') {
-      return response.status(400).json({error: error.message})
+      return response.status(400).json({ error: error.message })
     }
+    next(error)
   }
-
 })
+
 
 blogRouter.delete('/:id', middleware.userExtractor, middleware.tokenExtractor, async (request, response, next) => {
   

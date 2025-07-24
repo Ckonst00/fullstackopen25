@@ -168,13 +168,25 @@ test('Update likes', async () => {
     likes: 38,
   }
 
-  const update = await api
+  const response = await api
     .post('/api/blogs')
     .set('Authorization', token)
     .send(newBlog)
     .expect(201)
 
-  assert.strictEqual(update.body.likes, newBlog.likes)
+
+  const updatedBlog = {
+    ...newBlog,
+    likes: 99, 
+  }
+
+  const update = await api
+    .put(`/api/blogs/${response.body.id}`)
+    .send(updatedBlog)
+    .expect(200)
+
+  assert.strictEqual(update.body.likes, updatedBlog.likes)
+
 })
 
 after(async () => {
