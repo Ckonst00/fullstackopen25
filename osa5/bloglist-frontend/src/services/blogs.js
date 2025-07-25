@@ -26,5 +26,14 @@ const setLike = async newObject => {
   return response.data
 }
 
+const remove = id => {
+  const config = {
+    headers: { Authorization: token }
+  }
+  const url = `${baseUrl}/${id}`
+  const response = axios.delete(url, config)
+  return response.data
+}
 
-export default { getAll, create, setToken, setLike }
+
+export default { getAll, create, setToken, setLike, remove }

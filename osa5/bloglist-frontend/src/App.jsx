@@ -170,9 +170,12 @@ const App = () => {
       <ErrorNotification message={errorMessage} />
       <p>{user.name} logged in <button onClick={handleLogOut}>log out</button></p>
       {newBlogForm()}
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
+      {blogs
+        .slice()
+        .sort((a, b) => b.likes - a.likes)
+        .map(blog =>
+          <Blog key={blog.id} blog={blog} user={user} />
+        )}
     </div>
   )
 }
