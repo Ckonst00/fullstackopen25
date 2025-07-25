@@ -85,6 +85,7 @@ const App = () => {
 
   }
 
+
   const handleNewBlog = async (event) => {
     event.preventDefault()
     try {

@@ -1,7 +1,7 @@
 import { render, screen, cleanup } from '@testing-library/react'
 import Blog from './Blog'
 import userEvent from '@testing-library/user-event'
-import { expect } from 'vitest'
+import { expect, vi } from 'vitest'
 
 
 const user = {
@@ -37,4 +37,22 @@ test('render the whole blog content', async () => {
     expect(screen.getByText(blog.url)).toBeInTheDocument()
     expect(screen.getByText(`likes ${blog.likes}`)).toBeInTheDocument()
     expect(screen.getByText(blog.user.name)).toBeInTheDocument()
+})
+
+test('like button is pressed twice', async () => {
+
+  const mockHandler = vi.fn()
+  const userClick = userEvent.setup()
+
+  render(<Blog blog={blog} user={user} handleLike={mockHandler} />)
+
+  const viewButton = screen.getByRole('button', { name: 'view' })
+  await userClick.click(viewButton)
+
+  const likeButton = screen.getByRole('button', { name: 'like' })
+  await userClick.click(likeButton)
+  await userClick.click(likeButton)
+
+  expect(mockHandler).toHaveBeenCalledTimes(2)
+    
 })

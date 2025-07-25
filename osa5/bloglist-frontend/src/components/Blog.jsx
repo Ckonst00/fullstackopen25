@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, user }) => {
+const Blog = ({ blog, user, handleLike }) => {
 
   const [visible, setVisible] = useState(false)
   const [blogOwner, setBlogOwner] = useState(false)
@@ -12,7 +12,11 @@ const Blog = ({ blog, user }) => {
       setBlogOwner(true)
     }
   }, [blog.user, user])
-  const handleLike = async () => {
+  
+const onLike = async () => {
+  if (handleLike) {
+    handleLike(blog)
+  } else {
     try {
       const updatedBlog = {
         id: blog.id,
@@ -23,13 +27,14 @@ const Blog = ({ blog, user }) => {
         url: blog.url,
       }
 
-
       await blogService.setLike(updatedBlog)
       setLikes(likes + 1)
     } catch (error) {
       console.error('Error liking blog:', error.response?.data || error.message)
     }
   }
+}
+
 
   const handleDelete =  (id, title, author) => {
     if (window.confirm(`Remove blog ${title} by ${author}`)) {
@@ -58,13 +63,13 @@ const Blog = ({ blog, user }) => {
       <div style={showWhenVisible} data-testid='info-view'>
         <div>{blog.title} {blog.author} <button onClick={() => setVisible(false)}>hide</button></div>
         <div>{blog.url}</div>
-        <div>likes {likes}<button onClick={handleLike}>like</button></div>
+        <div>likes {likes}<button onClick={onLike}>like</button></div>
         <div>{blog.user?.name || 'Unknown user'}</div>
         {blogOwner && (
           <button onClick={() => handleDelete(blog.id, blog.title, blog.author)}>remove</button>
         )}
       </div>
-      
+
   return (
     <div style={blogStyle}>
       {visible ? infoView : defaultView}
