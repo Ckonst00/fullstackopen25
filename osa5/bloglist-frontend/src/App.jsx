@@ -81,7 +81,7 @@ const App = () => {
 
   const handleLogOut = () => {
     window.localStorage.clear()
-    window.location.reload();
+    window.location.reload()
 
   }
 
