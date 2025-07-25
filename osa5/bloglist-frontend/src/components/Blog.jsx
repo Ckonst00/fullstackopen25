@@ -6,6 +6,7 @@ const Blog = ({ blog, user }) => {
   const [visible, setVisible] = useState(false)
   const [blogOwner, setBlogOwner] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
+
   useEffect(() => {
     if (blog.user && user && blog.user.username === user.username) {
       setBlogOwner(true)
@@ -46,13 +47,15 @@ const Blog = ({ blog, user }) => {
   }
   const hideWhenVisible = { display: visible ? 'none' : '' }
   const showWhenVisible = { display: visible ? '' : 'none' }
+ 
 
-  return (
-    <div style={blogStyle}>
-      <div style={hideWhenVisible}>
-        <div>{blog.title} {blog.author} <button onClick={() => setVisible(true)}>view</button></div>
-      </div>
-      <div style={showWhenVisible}>
+  const defaultView = 
+        <div style={hideWhenVisible}>
+          <div>{blog.title} {blog.author} <button onClick={() => setVisible(true)}>view</button></div>
+        </div>
+
+  const infoView = 
+      <div style={showWhenVisible} data-testid='info-view'>
         <div>{blog.title} {blog.author} <button onClick={() => setVisible(false)}>hide</button></div>
         <div>{blog.url}</div>
         <div>likes {likes}<button onClick={handleLike}>like</button></div>
@@ -61,6 +64,10 @@ const Blog = ({ blog, user }) => {
           <button onClick={() => handleDelete(blog.id, blog.title, blog.author)}>remove</button>
         )}
       </div>
+      
+  return (
+    <div style={blogStyle}>
+      {visible ? infoView : defaultView}
     </div>
   )
 
