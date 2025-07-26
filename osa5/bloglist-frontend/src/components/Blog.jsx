@@ -12,28 +12,28 @@ const Blog = ({ blog, user, handleLike }) => {
       setBlogOwner(true)
     }
   }, [blog.user, user])
-  
-const onLike = async () => {
-  if (handleLike) {
-    handleLike(blog)
-  } else {
-    try {
-      const updatedBlog = {
-        id: blog.id,
-        user: blog.user.id,
-        likes: likes + 1,
-        author: blog.author,
-        title: blog.title,
-        url: blog.url,
-      }
 
-      await blogService.setLike(updatedBlog)
-      setLikes(likes + 1)
-    } catch (error) {
-      console.error('Error liking blog:', error.response?.data || error.message)
+  const onLike = async () => {
+    if (handleLike) {
+      handleLike(blog)
+    } else {
+      try {
+        const updatedBlog = {
+          id: blog.id,
+          user: blog.user.id,
+          likes: likes + 1,
+          author: blog.author,
+          title: blog.title,
+          url: blog.url,
+        }
+
+        await blogService.setLike(updatedBlog)
+        setLikes(likes + 1)
+      } catch (error) {
+        console.error('Error liking blog:', error.response?.data || error.message)
+      }
     }
   }
-}
 
 
   const handleDelete =  (id, title, author) => {
@@ -52,14 +52,13 @@ const onLike = async () => {
   }
   const hideWhenVisible = { display: visible ? 'none' : '' }
   const showWhenVisible = { display: visible ? '' : 'none' }
- 
 
-  const defaultView = 
+  const defaultView =
         <div style={hideWhenVisible}>
           <div>{blog.title} {blog.author} <button onClick={() => setVisible(true)}>view</button></div>
         </div>
 
-  const infoView = 
+  const infoView =
       <div style={showWhenVisible} data-testid='info-view'>
         <div>{blog.title} {blog.author} <button onClick={() => setVisible(false)}>hide</button></div>
         <div>{blog.url}</div>

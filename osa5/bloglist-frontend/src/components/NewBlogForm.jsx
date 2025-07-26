@@ -14,13 +14,13 @@ const BlogForm = ({
       <h2>create new</h2>
       <form onSubmit={handleNewBlog}>
         <div>
-          title:<input type='text' value={blogTitle} onChange={({ target }) => setBlogTitle(target.value)} />
+          title:<input id='textbox-title' type='text' value={blogTitle} onChange={({ target }) => setBlogTitle(target.value)} />
         </div>
         <div>
-          author: <input type='text' value={blogAuthor} onChange={({ target }) => setBlogAuthor(target.value)} />
+          author: <input id='textbox-author' type='text' value={blogAuthor} onChange={({ target }) => setBlogAuthor(target.value)} />
         </div>
         <div>
-          url: <input type='text' value={blogUrl} onChange={({ target }) => setBlogUrl(target.value)} />
+          url: <input id='textbox-url' type='text' value={blogUrl} onChange={({ target }) => setBlogUrl(target.value)} />
         </div>
         <button type='submit'>create</button>
       </form>
