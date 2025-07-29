@@ -92,7 +92,6 @@ describe('Blog app', function () {
         author: 'Michael Imperionalli',
         url: 'www.mchi.com'
       })
-      cy.get('#logout-button').click()
     })
 
     it('Remove button is not there', function() {
@@ -100,6 +99,54 @@ describe('Blog app', function () {
       cy.contains('Witty blog')
       cy.get('#view-button').click()
       cy.contains('#remove-button').should('not.exist')
+    })
+  })
+
+  describe('Test for blog order by likes', function() {
+    beforeEach(function() {
+      cy.login({ username: 'testjester', password: 'salasana'})
+      cy.newBlog({
+        title: 'Witty blog',
+        author: 'Michael Imperionalli',
+        url: 'www.mchi.com',
+        likes: 3
+      })
+      cy.newBlog({
+        title: 'Boring blog',
+        author: 'Michael Imperionalli',
+        url: 'www.mchi.com',
+        likes: 2
+      })
+      cy.newBlog({
+        title: 'Stupid Norway',
+        author: 'Hate from Finland',
+        url: 'www.fasdfdsaf.com',
+        likes: 1
+      })
+    })
+
+    it('test for blog order', function() {
+      cy.intercept('PUT', '/api/blogs/*').as('updateBlog')
+  
+      cy.get('.blog').eq(0).should('contain', 'Witty blog Michael Imperionalli')
+      cy.get('.blog').eq(1).should('contain', 'Boring blog Michael Imperionalli')
+      cy.get('.blog').eq(2).should('contain', 'Stupid Norway Hate from Finland')
+
+
+      cy.get('.blog').eq(1).within(() => {
+        cy.get('#view-button').click()
+        cy.get('#like-button').click()
+      })
+      cy.wait('@updateBlog')
+      cy.get('#like-button').click()
+
+      cy.wait('@updateBlog')
+      cy.reload()
+
+      cy.get('.blog').eq(0).should('contain', 'Boring blog Michael Imperionalli')
+      cy.get('.blog').eq(1).should('contain', 'Witty blog Michael Imperionalli')
+      cy.get('.blog').eq(2).should('contain', 'Stupid Norway Hate from Finland')
+
     })
   })
 })

@@ -70,7 +70,7 @@ const Blog = ({ blog, user, handleLike }) => {
       </div>
 
   return (
-    <div style={blogStyle}>
+    <div className='blog' style={blogStyle}>
       {visible ? infoView : defaultView}
     </div>
   )
