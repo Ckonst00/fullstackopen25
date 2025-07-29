@@ -1,6 +1,6 @@
 describe('Blog app', function () {
   beforeEach(function () {
-    cy.request('POST',  `${Cypress.env('BACKEND')}/testing/reset`)
+    cy.request('POST', `${Cypress.env('BACKEND')}/testing/reset`)
     cy.request('POST', `${Cypress.env('BACKEND')}/users`, {
       username: 'testjester',
       name: 'Jest User',
@@ -38,9 +38,9 @@ describe('Blog app', function () {
     })
   })
 
-  describe('When logged in', function() {
-    beforeEach(function() {
-      cy.login({ username: 'testjester', password: 'salasana'})
+  describe('When logged in', function () {
+    beforeEach(function () {
+      cy.login({ username: 'testjester', password: 'salasana' })
       cy.newBlog({
         title: 'Another blog cypress',
         author: 'Sam Ansung',
@@ -48,7 +48,7 @@ describe('Blog app', function () {
       })
     })
 
-    it('A blog can be created', function() {
+    it('A blog can be created', function () {
       cy.get('#new-blog').click()
       cy.get('#textbox-title').type('Writing witty titles')
       cy.get('#textbox-author').type('Barry Log')
@@ -63,7 +63,7 @@ describe('Blog app', function () {
       cy.contains('Writing witty titles Barry Log')
     })
 
-    it('liking a blog', function() {
+    it('liking a blog', function () {
       cy.contains('Another blog cypress Sam Ansung')
       cy.get('#view-button').click()
       cy.contains('likes 0')
@@ -71,7 +71,7 @@ describe('Blog app', function () {
       cy.contains('likes 1')
     })
 
-    it('deleting a blog', function() {
+    it('deleting a blog', function () {
       cy.intercept('DELETE', '/api/blogs/*').as('deleteBlog')
       cy.contains('Another blog cypress Sam Ansung')
       cy.get('#view-button').click()
@@ -84,9 +84,9 @@ describe('Blog app', function () {
     })
   })
 
-  describe('Only blog owner can see the remove-button', function() {
-    beforeEach(function() {
-      cy.login({ username: 'testjester', password: 'salasana'})
+  describe('Only blog owner can see the remove-button', function () {
+    beforeEach(function () {
+      cy.login({ username: 'testjester', password: 'salasana' })
       cy.newBlog({
         title: 'Witty blog',
         author: 'Michael Imperionalli',
@@ -94,17 +94,17 @@ describe('Blog app', function () {
       })
     })
 
-    it('Remove button is not there', function() {
-      cy.login({ username: 'testuser', password: 'salasana'})
+    it('Remove button is not there', function () {
+      cy.login({ username: 'testuser', password: 'salasana' })
       cy.contains('Witty blog')
       cy.get('#view-button').click()
       cy.contains('#remove-button').should('not.exist')
     })
   })
 
-  describe('Test for blog order by likes', function() {
-    beforeEach(function() {
-      cy.login({ username: 'testjester', password: 'salasana'})
+  describe('Test for blog order by likes', function () {
+    beforeEach(function () {
+      cy.login({ username: 'testjester', password: 'salasana' })
       cy.newBlog({
         title: 'Witty blog',
         author: 'Michael Imperionalli',
@@ -125,9 +125,9 @@ describe('Blog app', function () {
       })
     })
 
-    it('test for blog order', function() {
+    it('test for blog order', function () {
       cy.intercept('PUT', '/api/blogs/*').as('updateBlog')
-  
+
       cy.get('.blog').eq(0).should('contain', 'Witty blog Michael Imperionalli')
       cy.get('.blog').eq(1).should('contain', 'Boring blog Michael Imperionalli')
       cy.get('.blog').eq(2).should('contain', 'Stupid Norway Hate from Finland')
