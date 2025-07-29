@@ -6,7 +6,11 @@ describe('Blog app', function () {
       name: 'Jest User',
       password: 'salasana'
     })
-
+    cy.request('POST', `${Cypress.env('BACKEND')}/users`, {
+      username: 'testuser',
+      name: 'Michael User',
+      password: 'salasana'
+    })
     cy.visit('')
   })
 
@@ -37,6 +41,11 @@ describe('Blog app', function () {
   describe('When logged in', function() {
     beforeEach(function() {
       cy.login({ username: 'testjester', password: 'salasana'})
+      cy.newBlog({
+        title: 'Another blog cypress',
+        author: 'Sam Ansung',
+        url: 'www.samsung.com'
+      })
     })
 
     it('A blog can be created', function() {
@@ -53,24 +62,44 @@ describe('Blog app', function () {
 
       cy.contains('Writing witty titles Barry Log')
     })
-  })
-
-  describe('A blog can be liked', function() {
-    beforeEach(function() {
-      cy.login({ username: 'testjester', password: 'salasana'})
-      cy.newBlog({
-        title: 'Another blog cypress',
-        author: 'Sam Ansung',
-        url: 'www.samsung.com'
-      })
-    })
 
     it('liking a blog', function() {
+      cy.contains('Another blog cypress Sam Ansung')
       cy.get('#view-button').click()
       cy.contains('likes 0')
       cy.get('#like-button').click()
       cy.contains('likes 1')
     })
 
+    it('deleting a blog', function() {
+      cy.intercept('DELETE', '/api/blogs/*').as('deleteBlog')
+      cy.contains('Another blog cypress Sam Ansung')
+      cy.get('#view-button').click()
+
+      cy.on('window:confirm', () => true)
+      cy.get('#remove-button').click()
+      cy.wait('@deleteBlog')
+      cy.reload()
+      cy.get('html').should('not.contain', 'Another blog cypress Sam Ansung')
+    })
+  })
+
+  describe('Only blog owner can see the remove-button', function() {
+    beforeEach(function() {
+      cy.login({ username: 'testjester', password: 'salasana'})
+      cy.newBlog({
+        title: 'Witty blog',
+        author: 'Michael Imperionalli',
+        url: 'www.mchi.com'
+      })
+      cy.get('#logout-button').click()
+    })
+
+    it('Remove button is not there', function() {
+      cy.login({ username: 'testuser', password: 'salasana'})
+      cy.contains('Witty blog')
+      cy.get('#view-button').click()
+      cy.contains('#remove-button').should('not.exist')
+    })
   })
 })

@@ -171,7 +171,7 @@ const App = () => {
       <h2>blogs</h2>
       <SuccessNotification message={message} />
       <ErrorNotification message={errorMessage} />
-      <p>{user.name} logged in <button onClick={handleLogOut}>log out</button></p>
+      <p>{user.name} logged in <button id='logout-button' onClick={handleLogOut}>log out</button></p>
       {newBlogForm()}
       {blogs
         .slice()
