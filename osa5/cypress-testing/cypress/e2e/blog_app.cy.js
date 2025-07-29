@@ -1,13 +1,13 @@
 describe('Blog app', function () {
   beforeEach(function () {
-    cy.request('POST', 'http://localhost:3003/api/testing/reset')
-    cy.request('POST', 'http://localhost:3003/api/users', {
+    cy.request('POST',  `${Cypress.env('BACKEND')}/testing/reset`)
+    cy.request('POST', `${Cypress.env('BACKEND')}/users`, {
       username: 'testjester',
       name: 'Jest User',
       password: 'salasana'
     })
 
-    cy.visit('http://localhost:5173')
+    cy.visit('')
   })
 
   it('Login form is shown', function () {
@@ -30,15 +30,13 @@ describe('Blog app', function () {
       cy.get('#password').type('fffffeeee')
       cy.get('#login-button').click()
 
-      cy.contains('wrong username or password')
+      cy.get('.error').contains('wrong username or password')
     })
   })
 
   describe('When logged in', function() {
     beforeEach(function() {
-      cy.get('#username').type('testjester')
-      cy.get('#password').type('salasana')
-      cy.get('#login-button').click()
+      cy.login({ username: 'testjester', password: 'salasana'})
     })
 
     it('A blog can be created', function() {
@@ -55,5 +53,24 @@ describe('Blog app', function () {
 
       cy.contains('Writing witty titles Barry Log')
     })
+  })
+
+  describe('A blog can be liked', function() {
+    beforeEach(function() {
+      cy.login({ username: 'testjester', password: 'salasana'})
+      cy.newBlog({
+        title: 'Another blog cypress',
+        author: 'Sam Ansung',
+        url: 'www.samsung.com'
+      })
+    })
+
+    it('liking a blog', function() {
+      cy.get('#view-button').click()
+      cy.contains('likes 0')
+      cy.get('#like-button').click()
+      cy.contains('likes 1')
+    })
+
   })
 })

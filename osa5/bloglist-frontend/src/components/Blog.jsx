@@ -55,14 +55,14 @@ const Blog = ({ blog, user, handleLike }) => {
 
   const defaultView =
         <div style={hideWhenVisible}>
-          <div>{blog.title} {blog.author} <button onClick={() => setVisible(true)}>view</button></div>
+          <div>{blog.title} {blog.author} <button id='view-button' onClick={() => setVisible(true)}>view</button></div>
         </div>
 
   const infoView =
       <div style={showWhenVisible} data-testid='info-view'>
         <div>{blog.title} {blog.author} <button onClick={() => setVisible(false)}>hide</button></div>
         <div>{blog.url}</div>
-        <div>likes {likes}<button onClick={onLike}>like</button></div>
+        <div>likes {likes}<button id='like-button' onClick={onLike}>like</button></div>
         <div>{blog.user?.name || 'Unknown user'}</div>
         {blogOwner && (
           <button onClick={() => handleDelete(blog.id, blog.title, blog.author)}>remove</button>
